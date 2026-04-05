@@ -55,7 +55,7 @@ spring:
 
         # Notification Service
         - id: notification-service
-          uri: lb://notification-service
+          uri: lb://NOTIFICATION_SERVICE
           predicates:
             - Path=/notifications/**
 
