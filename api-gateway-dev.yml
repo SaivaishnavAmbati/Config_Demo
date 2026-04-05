@@ -59,6 +59,12 @@ spring:
           predicates:
             - Path=/notifications/**
 
+        # Payment Service
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payments/**
+
         # Swagger / OpenAPI per service
         - id: auth-service-swagger
           uri: lb://AUTH-SERVICE
@@ -95,6 +101,13 @@ spring:
           filters:
             - RewritePath=/notification-service/(?<segment>.*), /$\{segment}
 
+        - id: payment-service-swagger
+          uri: lb://payment-service
+          predicates:
+            - Path=/payment-service/v3/api-docs/**
+          filters:
+            - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
+
 eureka:
   instance:
     prefer-ip-address: true
@@ -130,6 +143,8 @@ springdoc:
         url: /document-service/v3/api-docs
       - name: notification-service
         url: /notification-service/v3/api-docs
+      - name: payment-service
+        url: /payment-service/v3/api-docs
 
 jwt:
   secret: ${JWT_SECRET:change-me-to-a-long-secret-change-me-to-a-long-secret}

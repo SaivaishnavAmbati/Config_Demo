@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/payr_loan?createDatabaseIfNotExist=true
     username: root
-    password: 6303
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
