@@ -1,0 +1,136 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - http://localhost:8080
+              - http://localhost:4200
+              - http://localhost:3000
+              - http://127.0.0.1:4200
+              - http://127.0.0.1:3000
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+
+      routes:
+        # Auth Service
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
+
+        # Loan Service (current API base: /api/loans/**)
+        - id: loan-service
+          uri: lb://loan-service
+          predicates:
+            - Path=/api/loans/**
+
+        # User Service
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**,/api/customers/**,/api/officers/**,/api/admins/**
+
+        # Document Service
+        - id: document-service
+          uri: lb://DOCUMENT-SERVICE
+          predicates:
+            - Path=/api/documents/**
+
+        # Notification Service
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/notifications/**
+
+        # Swagger / OpenAPI per service
+        - id: auth-service-swagger
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth-service/v3/api-docs/**
+          filters:
+            - RewritePath=/auth-service/(?<segment>.*), /$\{segment}
+
+        - id: loan-service-swagger
+          uri: lb://loan-service
+          predicates:
+            - Path=/loan-service/v3/api-docs/**
+          filters:
+            - RewritePath=/loan-service/(?<segment>.*), /$\{segment}
+
+        - id: user-service-swagger
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/v3/api-docs/**
+          filters:
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+
+        - id: document-service-swagger
+          uri: lb://DOCUMENT-SERVICE
+          predicates:
+            - Path=/document-service/v3/api-docs/**
+          filters:
+            - RewritePath=/document-service/(?<segment>.*), /$\{segment}
+
+        - id: notification-service-swagger
+          uri: lb://notification-service
+          predicates:
+            - Path=/notification-service/v3/api-docs/**
+          filters:
+            - RewritePath=/notification-service/(?<segment>.*), /$\{segment}
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  tracing:
+    sampling:
+      probability: 1.0
+    enabled: true
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: auth-service
+        url: /auth-service/v3/api-docs
+      - name: loan-service
+        url: /loan-service/v3/api-docs
+      - name: user-service
+        url: /user-service/v3/api-docs
+      - name: document-service
+        url: /document-service/v3/api-docs
+      - name: notification-service
+        url: /notification-service/v3/api-docs
+
+jwt:
+  secret: ${JWT_SECRET:change-me-to-a-long-secret-change-me-to-a-long-secret}
+  expirationMinutes: ${JWT_EXP_MINUTES:60}
