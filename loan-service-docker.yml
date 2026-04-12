@@ -13,6 +13,11 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: loan-service-group
+      auto-offset-reset: earliest
 
 eureka:
   instance:
